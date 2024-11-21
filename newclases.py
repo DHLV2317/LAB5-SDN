@@ -90,6 +90,35 @@ def getCursos(datos,alumnos,servidores):
     return cursos
 
 
+def actualizar_curso(cursos, alumnos):
+    codigo_curso = input("Ingrese el código del curso: ")
+    curso = next((c for c in cursos if c.codigo == codigo_curso), None)
+    if curso:
+        print("1) Agregar Alumno\n2) Eliminar Alumno")
+        op = input(">>> ")
+        if op == "1":
+            codigo_alumno = input("Ingrese el código del alumno: ")
+            alumno = next((a for a in alumnos if a.codigo == codigo_alumno), None)
+            if alumno:
+                curso.agregar_alumno(alumno)
+                print(f"Alumno {alumno.nombre} agregado al curso {curso.nombre}")
+            else:
+                print("Alumno no encontrado.")
+        elif op == "2":
+            codigo_alumno = input("Ingrese el código del alumno: ")
+            alumno = next((a for a in curso.alumnos if a.codigo == codigo_alumno), None)
+            if alumno:
+                curso.alumnos.remove(alumno)
+                print(f"Alumno {alumno.nombre} eliminado del curso {curso.nombre}")
+            else:
+                print("Alumno no encontrado en el curso.")
+        else:
+            print("Opción inválida.")
+    else:
+        print("Curso no encontrado.")
+
+
+
 def detallesCurso(cursos):
     print("*--*--*--*--*--*--*--*--*--*--*--*--*--*")
     for curso in cursos:
@@ -178,6 +207,76 @@ def display2():
     print("Saliendo...")
     print()
 
+
+
+def crear_conexion(cursos, alumno_mac, servidor_ip, servicio_nombre):
+    # Validar autorización del alumno
+    autorizado = False
+    for curso in cursos:
+        if any(alumno.mac == alumno_mac for alumno in curso.alumnos) and curso.estado == "DICTANDO":
+            for servidor in curso.servidores:
+                if servidor.direccion_ip == servidor_ip:
+                    if any(servicio.nombre == servicio_nombre for servicio in servidor.servicios):
+                        autorizado = True
+                        break
+            if autorizado:
+                break
+        
+    if not autorizado:
+        print("Error: El alumno no está autorizado para acceder a este servicio.")
+        return
+
+    # Establecer la ruta (simulación aquí, deberías integrar con Floodlight)
+    print(f"Estableciendo conexión entre {alumno_mac} y {servidor_ip} para el servicio {servicio_nombre}.")
+    # Aquí iría la llamada a build_route()
+
+def listar_conexiones(conexiones):
+    if not conexiones:
+        print("No hay conexiones activas.")
+        return
+    
+    print("*--*--*--*--*--*--*--*--*--*--*--*--*--*")
+    print("Conexiones activas:")
+    for i, conexion in enumerate(conexiones, start=1):
+        print(f"Conexión {i}:")
+        print(f"  Alumno (MAC): {conexion['alumno_mac']}")
+        print(f"  Servidor (IP): {conexion['servidor_ip']}")
+        print(f"  Servicio: {conexion['servicio']}")
+        print(f"  Protocolo: {conexion['protocolo']}")
+        print(f"  Puerto: {conexion['puerto']}")
+        print("*--*--*--*--*--*--*--*--*--*--*--*--*--*")
+
+def borrar_conexion(conexiones):
+    if not conexiones:
+        print("No hay conexiones activas para borrar.")
+        return
+    
+    listar_conexiones(conexiones)  # Mostrar las conexiones activas
+    try:
+        num = int(input("Ingrese el número de la conexión que desea borrar: "))
+        if 1 <= num <= len(conexiones):
+            conexion_eliminada = conexiones.pop(num - 1)
+            print(f"Conexión eliminada:")
+            print(f"  Alumno (MAC): {conexion_eliminada['alumno_mac']}")
+            print(f"  Servidor (IP): {conexion_eliminada['servidor_ip']}")
+            print(f"  Servicio: {conexion_eliminada['servicio']}")
+        else:
+            print("Número inválido.")
+    except ValueError:
+        print("Por favor, ingrese un número válido.")
+
+conexiones = [
+    {
+        "alumno_mac": "00:44:11:22:44:A7:2A",
+        "servidor_ip": "10.0.0.3",
+        "servicio": "ssh",
+        "protocolo": "TCP",
+        "puerto": 23
+    },
+    # poner mas conexiones
+]
+
+
 def main():
     datos = load_yaml('inf_final/database.yaml')  # Asegúrate de usar la ruta correcta a tu archivo YAML
     
@@ -205,7 +304,7 @@ def main():
             elif(op2=="2"):
                 detallesCurso(cursos)
             elif(op2=="3"):
-                print("Implementar anadir eliminar alumno")
+                actualizar_curso(cursos, alumnos)
             else:
                 display2()
         case "3": #alumnos
@@ -235,6 +334,19 @@ def main():
             print("2) Listar")
             print("3)Borrar")
             op5 = input('>>>')
+            if op5 == "1":
+                alumno_mac = input("Ingrese la MAC del alumno: ")
+                servidor_ip = input("Ingrese la IP del servidor: ")
+                servicio_nombre = input("Ingrese el nombre del servicio: ")
+                crear_conexion(cursos, alumno_mac, servidor_ip, servicio_nombre)
+            elif op5 == "2":
+                print("Listando conexiones...")
+                listar_conexiones(conexiones)
+            elif op5 == "3":
+                print("Borrando conexión...")
+                borrar_conexion(conexiones)
+            else:
+                display2()
         case "6": #salir
             print("*--*--*--*--*--*--*--*--*--*--*--*--*--*")
             print("Saliendo...")
