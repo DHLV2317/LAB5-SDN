@@ -278,7 +278,7 @@ conexiones = [
 
 
 def main():
-    datos = load_yaml('inf_final/database.yaml')  # Asegúrate de usar la ruta correcta a tu archivo YAML
+    datos = load_yaml('database.yaml')  # Asegúrate de usar la ruta correcta a tu archivo YAML
     
     #Se pasa de yaml a objetos
     alumnos = getAlumnos(datos)
@@ -287,72 +287,73 @@ def main():
     cursos = getCursos(datos,alumnos,servidores)
     #implementar actualizar cursos
     
-    op = displayMenu()
-    
-    match op:
-        case "1":
-            print("*--*--*--*--*--*--*--*--*--*--*--*--*--*")
-            print("importar")
-            print()
-        case "2": #cursos
-            display1()
-            print("3) Actualizar")
-            op2 = input('>>>')
-            print()
-            if(op2=="1"):
-                listarCursos(cursos)
-            elif(op2=="2"):
-                detallesCurso(cursos)
-            elif(op2=="3"):
-                actualizar_curso(cursos, alumnos)
-            else:
-                display2()
-        case "3": #alumnos
-            display1()
-            op3 = input('>>>')
-            print()
-            if(op3=="1"):
-                listarAlumnos(alumnos)
-            elif(op3=="2"):
-                detalleAlumnos(alumnos)
-            else:
-                display2()
-        case "4": #servidores
-            display1()
-            op4 = input('>>>')
-            print()
-            if(op4=="1"):
-                listarServidores(servidores)
-            elif(op4=="2"):
-                detalleServidor(servidores)
-            else:
-                display2()
-        case "5": #rutas
-            print("*--*--*--*--*--*--*--*--*--*--*--*--*--*")
-            print("Seleccione una opcion:")
-            print("1) Crear")
-            print("2) Listar")
-            print("3)Borrar")
-            op5 = input('>>>')
-            if op5 == "1":
-                alumno_mac = input("Ingrese la MAC del alumno: ")
-                servidor_ip = input("Ingrese la IP del servidor: ")
-                servicio_nombre = input("Ingrese el nombre del servicio: ")
-                crear_conexion(cursos, alumno_mac, servidor_ip, servicio_nombre)
-            elif op5 == "2":
-                print("Listando conexiones...")
-                listar_conexiones(conexiones)
-            elif op5 == "3":
-                print("Borrando conexión...")
-                borrar_conexion(conexiones)
-            else:
-                display2()
-        case "6": #salir
-            print("*--*--*--*--*--*--*--*--*--*--*--*--*--*")
-            print("Saliendo...")
-        case _:
-            display2()
+    while True:  # Bucle infinito hasta que el usuario seleccione "salir"
+        op = displayMenu()
 
+        match op:
+            case "1":
+                print("*--*--*--*--*--*--*--*--*--*--*--*--*--*")
+                print("importar")
+                print()
+            case "2":  # Cursos
+                display1()
+                print("3) Actualizar")
+                op2 = input('>>>')
+                print()
+                if op2 == "1":
+                    listarCursos(cursos)
+                elif op2 == "2":
+                    detallesCurso(cursos)
+                elif op2 == "3":
+                    actualizar_curso(cursos, alumnos)
+                else:
+                    display2()
+            case "3":  # Alumnos
+                display1()
+                op3 = input('>>>')
+                print()
+                if op3 == "1":
+                    listarAlumnos(alumnos)
+                elif op3 == "2":
+                    detalleAlumnos(alumnos)
+                else:
+                    display2()
+            case "4":  # Servidores
+                display1()
+                op4 = input('>>>')
+                print()
+                if op4 == "1":
+                    listarServidores(servidores)
+                elif op4 == "2":
+                    detalleServidor(servidores)
+                else:
+                    display2()
+            case "5":  # Rutas
+                print("*--*--*--*--*--*--*--*--*--*--*--*--*--*")
+                print("Seleccione una opción:")
+                print("1) Crear")
+                print("2) Listar")
+                print("3) Borrar")
+                op5 = input('>>>')
+                if op5 == "1":
+                    alumno_mac = input("Ingrese la MAC del alumno: ")
+                    servidor_ip = input("Ingrese la IP del servidor: ")
+                    servicio_nombre = input("Ingrese el nombre del servicio: ")
+                    crear_conexion(cursos, alumno_mac, servidor_ip, servicio_nombre)
+                elif op5 == "2":
+                    print("Listando conexiones...")
+                    listar_conexiones(conexiones)
+                elif op5 == "3":
+                    print("Borrando conexión...")
+                    borrar_conexion(conexiones)
+                else:
+                    display2()
+            case "6":  # Salir
+                print("*--*--*--*--*--*--*--*--*--*--*--*--*--*")
+                print("Saliendo...")
+                break  # Rompe el bucle y termina el programa
+            case _:
+                display2()
     
 
     
